@@ -9,9 +9,8 @@ const int ledPin = 13;  // Built-in LED on most Arduino boards
 // Create the MIDI instance
 MIDI_CREATE_INSTANCE(HardwareSerial, MIDI_SERIAL, MIDI);
 
-unsigned long lastBeatTime = 0;
-int beatInterval = 0;
-bool ledState = LOW;
+const unsigned long pulseDuration = 50;  // LED on time in milliseconds
+unsigned long lastPulseTime = 0;
 
 void handleNoteOn(byte channel, byte note, byte velocity) {
   Serial.print("Note On: ch=");
@@ -45,12 +44,11 @@ void handleClock() {
   clockCount++;
 
   // MIDI sends 24 clock messages per quarter note
-  if (clockCount == 24) {
-    unsigned long currentTime = millis();
-    beatInterval = currentTime - lastBeatTime;
-    lastBeatTime = currentTime;
-    clockCount = 0;
+  if (clockCount == 24) {  // Pulse LED every quarter note
+    digitalWrite(ledPin, HIGH);
+    lastPulseTime = millis();
     Serial.println("Clock: Quarter Note");
+    clockCount = 0;
   }
 }
 
@@ -77,10 +75,8 @@ void setup() {
 void loop() {
   MIDI.read();
 
-  // Check if it's time to toggle the LED
-  if (millis() - lastBeatTime >= beatInterval / 2) {
-    ledState = !ledState;
-    digitalWrite(ledPin, ledState);
-    lastBeatTime = millis();
+  // Turn off LED after pulse duration
+  if (millis() - lastPulseTime >= pulseDuration) {
+    digitalWrite(ledPin, LOW);
   }
 }
