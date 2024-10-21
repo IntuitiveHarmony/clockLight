@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <MIDI.h>
 
-const int ledPin = 13;  // Built-in LED on most Arduino boards
+const int tempoPin = 13;  // Built-in LED on most Arduino boards
 
 // Define which serial port to use for MIDI
 #define MIDI_SERIAL Serial1
@@ -45,15 +45,15 @@ void handleClock() {
 
   // MIDI sends 24 clock messages per quarter note
   if (clockCount == 24) {  // Pulse LED every quarter note
-    digitalWrite(ledPin, HIGH);
+    digitalWrite(tempoPin, HIGH);
     lastPulseTime = millis();
-    Serial.println("Clock: Quarter Note");
+    // Serial.print(" 1/4 Note Pulse: ");
     clockCount = 0;
   }
 }
 
 void setup() {
-  pinMode(ledPin, OUTPUT);
+  pinMode(tempoPin, OUTPUT);
 
   // Initialize MIDI communications
   MIDI.begin(MIDI_CHANNEL_OMNI);  // Listen to all MIDI channels
@@ -77,6 +77,6 @@ void loop() {
 
   // Turn off LED after pulse duration
   if (millis() - lastPulseTime >= pulseDuration) {
-    digitalWrite(ledPin, LOW);
+    digitalWrite(tempoPin, LOW);
   }
 }
